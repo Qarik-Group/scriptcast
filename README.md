@@ -6,9 +6,9 @@ An application that automates Command-Line Interface (CLI) screencast output.
 
 By using `scriptcast`, you can make the output of a tutorial:
 
-    * repeatable
-    * maintainable
-    * interactive
+  * repeatable
+  * maintainable
+  * interactive
 
 ## Install
 
@@ -18,7 +18,7 @@ One click install goes here.  Essentially it will put the script in user's path.
 
 ### Dependencies
 
-The `randtype` tool, puts random mistakes while typing, to look more natural.
+The `randtype` tool puts random mistakes while typing to look more natural.
 
 ```
 git clone git@github.com:norman-abramovitz/randtype.git
