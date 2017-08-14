@@ -1,0 +1,97 @@
+#!/bin/bash
+
+check() {
+  command -v $1 >/dev/null 2>&1
+}
+
+declare simType
+declare simTypeFast
+
+check pv && {
+    simType="pv -qL 6"
+    simTypeFast="pv -qL 60"
+}
+
+check randtype && {
+    simType="randtype -t18,20000 -m 2"
+    simTypeFast="randtype -t 18,200 -m 0"
+}
+
+[[ -z "${simType}" ]] && {
+    echo "Please install either pv \"brew install pv\" or randtype \"git clone git@github.com:norman-abramovitz/randtype.git\""
+    exit 1
+}
+
+PROMPT_SUPER='# \c'
+PROMPT_NORMAL='$ \c'
+PROMPT_NOW="${PROMPT_NORMAL}"
+
+prompt() {
+    echo -e "${PROMPT_NOW}"
+}
+
+display() {
+    echo "$@" | ${simType}
+}
+
+run() {
+    echo "$@" | ${simType}
+    eval "$@"
+    local ret=$?
+    prompt
+    return "${ret}"
+}
+
+run_fast() {
+    echo "$@" | ${simTypeFast}
+    eval "$@"
+    local ret=$?
+    prompt
+    return "${ret}"
+}
+
+run_normal() {
+    echo "$@"
+    eval "$@"
+    local ret=$?
+    prompt
+    return "${ret}"
+}
+
+pause() {
+    local action=""
+    local eof=$(echo -e "\x04")
+    while [[ -z "${action}"  ]]
+    do
+        read -s -n 1 action || exit 0
+        case "${action}" in
+            b) return 0 ;;
+            c) return 1 ;;
+            "${eof}") exit 0 ;;
+        esac
+        action=""
+    done
+}
+
+repeat() {
+    run "$@"
+    local ret="$?"
+    while ! pause
+    do
+        run_fast "$@"
+        ret="$?"
+    done
+    return "${ret}"
+}
+
+erdiff() {
+    display diff "$1" "$2"
+    diff --unchanged-group-format='' \
+     --old-group-format="-------- %dn line%(n=1?:s) deleted at %df:%c'\\012'%<" \
+     --new-group-format="-------- %dN line%(N=1?:s) added after %de:%c'\\012'%>" \
+     --changed-group-format="-------- %dn line%(n=1?:s) changed at %df:%c'\\012'%<-------- to:%c'\\012'%>" \
+     "$1" "$2"
+    local ret=$?
+    prompt
+    return "${ret}"
+}
