@@ -1,0 +1,17 @@
+#!/bin/bash
+
+. ./bin/scriptcast
+
+# 1. clear the screen
+# 2. show the simple prompt
+# 3. pause for input
+
+clear
+prompt
+pause
+
+# say hello world after input
+
+display "Hello World."
+prompt
+pause
